@@ -19,11 +19,11 @@ Before you begin, ensure you have met the following requirements:
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone git@github.com:zyhazz/whatsbot.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd <project-directory>
+   cd whatsbot
    ```
 3. Install the dependencies:
    ```bash
