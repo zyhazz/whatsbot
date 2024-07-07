@@ -1,4 +1,3 @@
-```markdown
 # WhatsApp Chatbot with Ollama Responses
 
 This project is a WhatsApp chatbot built using TypeScript, leveraging the `whatsapp-web.js` library for WhatsApp integration and `axios` for HTTP requests. It utilizes the Ollama for model execution to generate intelligent responses for messages starting with `!`.
@@ -52,4 +51,3 @@ Contributions are welcome! For major changes, please open an issue first to disc
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-```
