@@ -4,14 +4,8 @@ import Whatsapp from 'whatsapp-web.js'
 const { Client, LocalAuth } = Whatsapp
 import axios from 'axios';
 
-const wwebVersion = '2.2408.1';
-
 const client = new Client({
     authStrategy: new LocalAuth(),
-    // webVersionCache: {
-    //     type: 'remote',
-    //     remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,
-    // },
 });
 
 client.on('qr', (qr) => {
@@ -27,8 +21,17 @@ client.on('message', (message) => {
         message.reply('pong');
     }
     if (message.body.startsWith('!ai')) {
-        const text = message.body.replace('!ai', '');
+        const text = message.body.slice(4);
         askOllama(text).then((response) => {
+            console.log("resposta", response)
+            message.reply(response);
+        });
+    }
+    if (message.body.startsWith('!')) {
+        //remove only the first ! from the message
+        const text = message.body.slice(1);
+        askOllama(text).then((response) => {
+            console.log("resposta", response)
             message.reply(response);
         });
     }
@@ -36,12 +39,12 @@ client.on('message', (message) => {
 });
 
 async function askOllama(question: string): Promise<string> {
-    const { data } = await axios.post('https://localhost:11434/api/generate', {
-        model: 'ollama',
-        prompt: question,
+    const { data } = await axios.post('http://localhost:11434/api/generate', {
+        model: 'llama3',
+        prompt: "Responda a questao a seguir em poucas palavras, em portugues do Brasil: " + question,
         stream: false,
     });
-    return data;
+    return data.response ?? 'Não foi possível obter uma resposta';
 }
 
 client.initialize();
