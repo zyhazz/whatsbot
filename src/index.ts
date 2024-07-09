@@ -34,12 +34,12 @@ client.on('message', async (message) => {
             const media = await message.downloadMedia();
             askLlava(text, media.data).then((response) => {
                 console.log("resposta", response)
-                message.reply(response);
+                message.reply("🤖👀\n" + response);
             });
         }else {
             askOllama(text).then((response) => {
                 console.log("resposta", response)
-                message.reply(response);
+                message.reply("🤖\n" + response);
             });
         }
     }
