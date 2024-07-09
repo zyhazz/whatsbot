@@ -1,7 +1,8 @@
 // @ts-ignore
 import qrcode from 'qrcode-terminal';
 import Whatsapp from 'whatsapp-web.js'
-const { Client, LocalAuth } = Whatsapp
+
+const {Client, LocalAuth, MessageMedia} = Whatsapp
 import axios from 'axios';
 
 const client = new Client({
@@ -43,11 +44,28 @@ client.on('message', async (message) => {
             });
         }
     }
+    if (message.body.startsWith('@')) {
+        const text = message.body.slice(1);
+        askStableDiffusion(text).then((response) => {
+            const image = response.images[0] ?? '';
+            if(!image){
+                message.reply("Não foi possível gerar uma imagem");
+                return;
+            }
+            const png = new MessageMedia('image/png', image);
+            message.reply(png).then(() => {
+                console.log("imagem enviada");
+            }).catch((error) => {
+                console.error("erro ao enviar imagem", error);
+            });
+        });
+    }
+
     console.log("mensagem recebida", message.body);
 });
 
 async function askOllama(question: string): Promise<string> {
-    const { data } = await axios.post('http://localhost:11434/api/generate', {
+    const {data} = await axios.post('http://localhost:11434/api/generate', {
         model: 'llama3',
         prompt: "Responda a questao a seguir em poucas palavras, em portugues do Brasil: " + question,
         stream: false,
@@ -64,6 +82,14 @@ async function askLlava(question: string, image: string): Promise<string> {
         images: [image],
     });
     return data.response ?? 'Não foi possível obter uma resposta';
+}
+
+async function askStableDiffusion(text: string) {
+    const {data} = await axios.post('http://localhost:7860/sdapi/v1/txt2img', {
+        prompt: text,
+        steps: 15,
+    });
+    return data
 }
 
 client.initialize();
