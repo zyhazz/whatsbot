@@ -11,8 +11,9 @@ create({
 }).then((client) => {
     console.log("client ready");
     client.onMessage(async (message) => {
-        console.log("New message:", message.body, message.author, message.chatId, message.id);
-        if (message?.body?.startsWith('!ping')) {
+        const isImage = message.type === 'image';
+        console.log("New message:", isImage ? message.caption : message.body, message.author, message.chatId, message.id);
+        if (!isImage && message?.body?.startsWith('!ping')) {
             client.reply(message.chatId, 'pong', message.id.toString()).then(() => {
                 console.log("pong enviado");
             }).catch((error) => {
@@ -20,7 +21,7 @@ create({
             });
             return;
         }
-        if (message.type === 'image' && message.caption) {
+        if (isImage) {
             const caption = message.caption ?? '';
             if (!caption.startsWith('!')) {
                 return;
@@ -43,7 +44,8 @@ create({
         }
         if (message.body.startsWith('!')) {
             const text = message.body.slice(1);
-            askOllama(text).then((response) => {
+            const author = message.isGroupMsg ? message.author : message.chatId;
+            askOllama(author, text).then((response) => {
                 console.log("resposta", response)
                 client.reply(message.chatId, "🤖\n" + response, message.id.toString()).then(() => {
                     console.log("resposta enviada");

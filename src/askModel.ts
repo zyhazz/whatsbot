@@ -1,15 +1,21 @@
 import axios from "axios";
+import contextAwareLlama from "./contextAwareLlama";
 
 const OLLAMA_HOST = process.env.OLLAMA_HOST ?? 'http://localhost:11434';
 const STABLE_DIFFUSION_HOST = process.env.STABLE_DIFFUSION_HOST ?? 'http://localhost:7860';
 
-export async function askOllama(question: string): Promise<string> {
-    const {data} = await axios.post(`${OLLAMA_HOST}/api/generate`, {
-        model: 'llama3',
-        prompt: `Responda a questao a seguir em poucas palavras, em portugues do Brasil: ${question}`,
-        stream: false,
-    });
-    return data.response ?? 'Não foi possível obter uma resposta';
+export async function askOllama(userId: string, question: string): Promise<string> {
+    const config = {
+        configurable: {
+            sessionId: userId,
+        },
+    };
+    return await contextAwareLlama.invoke(
+        {
+            input: question,
+        },
+        config
+    );
 }
 
 export async function askLlava(question: string, image: string): Promise<string> {
