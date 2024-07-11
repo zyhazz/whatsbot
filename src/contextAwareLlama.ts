@@ -8,7 +8,7 @@ const messageHistories: Record<string, InMemoryChatMessageHistory> = {};
 const prompt = ChatPromptTemplate.fromMessages([
     [
         "system",
-        `Você é um assistente útil que lembra todos os detalhes que o usuário compartilha com você. Você prefere mensagens simples, claras e diretas.`,
+        `Você é um assistente útil. Você prefere mensagens simples, claras e diretas.`,
     ],
     ["placeholder", "{chat_history}"],
     ["human", "{input}"],
@@ -33,6 +33,10 @@ const withMessageHistory = new RunnableWithMessageHistory({
     historyMessagesKey: "chat_history",
 });
 
-export default withMessageHistory;
+const clearUserHistory = (sessionId: string) => {
+    delete messageHistories[sessionId];
+}
+
+export {withMessageHistory, clearUserHistory};
 
 

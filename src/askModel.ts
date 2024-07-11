@@ -1,16 +1,20 @@
 import axios from "axios";
-import contextAwareLlama from "./contextAwareLlama";
+import { withMessageHistory, clearUserHistory } from "./contextAwareLlama";
 
 const OLLAMA_HOST = process.env.OLLAMA_HOST ?? 'http://localhost:11434';
 const STABLE_DIFFUSION_HOST = process.env.STABLE_DIFFUSION_HOST ?? 'http://localhost:7860';
 
 export async function askOllama(userId: string, question: string): Promise<string> {
+    if (question === 'clear') {
+        clearUserHistory(userId)
+        return 'Histórico limpo'
+    }
     const config = {
         configurable: {
             sessionId: userId,
         },
     };
-    return await contextAwareLlama.invoke(
+    return await withMessageHistory.invoke(
         {
             input: question,
         },

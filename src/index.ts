@@ -8,9 +8,15 @@ create({
     puppeteerOptions: {
         executablePath: undefined,
     }
-}).then((client) => {
+}).then(async (client) => {
     console.log("client ready");
-    client.onMessage(async (message) => {
+    const unreadMessages = await client.getUnreadMessages();
+    unreadMessages.forEach((message:Message) => {
+        handleMessage(message);
+    });
+    await client.onMessage(handleMessage);
+
+    async function handleMessage(message: Message) {
         const isImage = message.type === 'image';
         console.log("New message:", isImage ? message.caption : message.body, message.author, message.chatId, message.id);
         if (!isImage && message?.body?.startsWith('!ping')) {
@@ -68,16 +74,14 @@ create({
                     return;
                 }
                 const b64 = `data:image/png;base64,${image}`
-                client.sendImageFromBase64(message.chatId, b64, 'image.png', '🤖\n').then(() => {
+                client.sendImageFromBase64(message.chatId, b64, 'image.png', '🤖\n' + text).then(() => {
                     console.log("imagem enviada");
                 }).catch((error) => {
                     console.error("erro ao enviar imagem", error);
                 });
             });
         }
-    });
-
+    }
 }).catch((error) => {
     console.error("erro ao criar cliente", error);
 });
-
