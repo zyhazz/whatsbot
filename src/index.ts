@@ -1,4 +1,4 @@
-import {create} from 'venom-bot';
+import {create, Message} from 'venom-bot';
 import {askLlava, askOllama, askStableDiffusion} from "./askModel";
 
 create({
